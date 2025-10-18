@@ -19,7 +19,10 @@ public class Editora {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String nome;
+
+    @Column(nullable = false)
     private String endereco;
 
     @OneToMany(mappedBy = "editora", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -1,0 +1,24 @@
+package com.biblioteca.BibliotecaBD.domain.grafica;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+
+@Entity(name = "Contratada")
+@Table(name = "Contratada")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class GraficaContratada extends Grafica{
+
+    @Column(nullable = false)
+    private String endereco;
+
+    @OneToMany(mappedBy = "grafica_cont")
+    private List<Contrato> contrato;
+}

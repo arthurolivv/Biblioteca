@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public record LivroDto(
 
         @NotNull
-        Long ISBN,
+        String ISBN,
 
         @NotBlank
         String titulo,

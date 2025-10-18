@@ -1,11 +1,15 @@
 package com.biblioteca.BibliotecaBD.domain.livro;
 
+import com.biblioteca.BibliotecaBD.domain.autor.Autor;
 import com.biblioteca.BibliotecaBD.domain.editora.Editora;
 import com.biblioteca.BibliotecaBD.domain.editora.EditoraDto;
+import com.biblioteca.BibliotecaBD.domain.escreve.Escreve;
+import com.biblioteca.BibliotecaBD.domain.imprime.Imprime;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Table(name = "Livros")
 @Entity(name = "Livro")
@@ -17,11 +21,22 @@ import java.time.LocalDate;
 public class Livro {
 
     @Id
+    @Column(name = "ISBN")
     private String isbn;
+
+    @Column(nullable = false)
     private String titulo;
+
+    @Column(nullable = false)
     private LocalDate data_de_publicacao;
 
     @ManyToOne(fetch = FetchType.LAZY) //FetchType.LAZY - dados serao carregados sob demanda
     @JoinColumn(name="editora_id")
     private Editora editora;
+
+    @OneToMany(mappedBy = "livro")
+    private List<Escreve> escreve;
+
+    @OneToMany(mappedBy = "livro")
+    private List<Imprime> imprime;
 }

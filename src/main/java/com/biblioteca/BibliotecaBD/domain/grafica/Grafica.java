@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Grafica {
 
     @Id

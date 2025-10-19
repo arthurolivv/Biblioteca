@@ -39,4 +39,9 @@ public class Livro {
 
     @OneToMany(mappedBy = "livro")
     private List<Imprime> imprime;
+
+    public Livro(LivroIsbnDto livroIsbnDto, Editora editora){
+        this.editora = editora;
+        this.isbn = livroIsbnDto.ISBN();
+    }
 }

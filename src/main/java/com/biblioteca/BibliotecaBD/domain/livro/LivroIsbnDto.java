@@ -5,20 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-public record LivroDto(
+public record LivroIsbnDto(
 
         @NotNull
-        String ISBN,
-
-        @NotBlank
-        String titulo,
-
-        @NotBlank
-        LocalDate data_de_publicacao,
-
-        Editora editora
-
+        String ISBN
 ) {
 }

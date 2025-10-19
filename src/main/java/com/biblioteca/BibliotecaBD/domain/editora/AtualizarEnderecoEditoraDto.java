@@ -3,10 +3,7 @@ package com.biblioteca.BibliotecaBD.domain.editora;
 import jakarta.validation.constraints.NotBlank;
 
 
-public record EditoraDto (
-
-    @NotBlank
-    String nome,
+public record AtualizarEnderecoEditoraDto(
 
     @NotBlank
     String endereco

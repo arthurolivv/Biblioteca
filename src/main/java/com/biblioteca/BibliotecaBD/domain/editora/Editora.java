@@ -25,6 +25,11 @@ public class Editora {
     @Column(nullable = false)
     private String endereco;
 
-    @OneToMany(mappedBy = "editora", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "editora", fetch = FetchType.LAZY)
     private List<Livro> livros;
+
+    public Editora(EditoraDto editoraDto) {
+        this.nome = editoraDto.nome();
+        this.endereco = editoraDto.endereco();
+    }
 }

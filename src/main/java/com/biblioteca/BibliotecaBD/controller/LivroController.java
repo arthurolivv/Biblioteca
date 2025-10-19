@@ -54,6 +54,6 @@ public class LivroController {
     @Transactional
     public void remover(@PathVariable String isbn) {
 
-        livroRepository.deleteById(isbn)
+        livroRepository.deleteById(isbn);
     }
 }

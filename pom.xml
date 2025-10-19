@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.biblioteca</groupId>
-	<artifactId>BibliotecaBD</artifactId>
+	<artifactId>GraficaBD</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>BibliotecaBD</name>
 	<description>Trabalho da disciplina Banco de Dados I - Bacharelado em Sistemas de Informação (Universidade de São Paulo)</description>

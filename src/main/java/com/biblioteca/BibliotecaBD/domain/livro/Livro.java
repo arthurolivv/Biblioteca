@@ -5,6 +5,7 @@ import com.biblioteca.BibliotecaBD.domain.editora.Editora;
 import com.biblioteca.BibliotecaBD.domain.editora.EditoraDto;
 import com.biblioteca.BibliotecaBD.domain.escreve.Escreve;
 import com.biblioteca.BibliotecaBD.domain.imprime.Imprime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,16 +33,25 @@ public class Livro {
 
     @ManyToOne(fetch = FetchType.LAZY) //FetchType.LAZY - dados serao carregados sob demanda
     @JoinColumn(name="editora_id")
+    @JsonIgnore
     private Editora editora;
 
-    @OneToMany(mappedBy = "livro")
+    @OneToMany(mappedBy = "livro", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Escreve> escreve;
 
-    @OneToMany(mappedBy = "livro")
+    @OneToMany(mappedBy = "livro", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Imprime> imprime;
 
     public Livro(LivroIsbnDto livroIsbnDto, Editora editora){
         this.editora = editora;
         this.isbn = livroIsbnDto.ISBN();
+    }
+
+    public Livro(LivroDto livroDto) {
+        this.isbn = livroDto.ISBN();
+        this.titulo = livroDto.titulo();
+        this.data_de_publicacao = livroDto.data_de_publicacao();
     }
 }

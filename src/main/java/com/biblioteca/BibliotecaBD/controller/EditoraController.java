@@ -72,10 +72,13 @@ public class EditoraController {
 
     @GetMapping
     public List<ListarEditoraDto> listar() {
-        return editoraRepository.findAll()
+
+        List<ListarEditoraDto> editoras = editoraRepository.findAll()
                 .stream()
                 .map(ListarEditoraDto::new)
                 .toList();
+
+        return editoras;
     }
 
     @DeleteMapping("/{id}")

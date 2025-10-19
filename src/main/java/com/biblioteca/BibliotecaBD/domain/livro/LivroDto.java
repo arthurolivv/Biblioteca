@@ -9,16 +9,16 @@ import java.time.LocalDateTime;
 
 public record LivroDto(
 
-        @NotNull
+        @NotBlank
         String ISBN,
 
         @NotBlank
         String titulo,
 
-        @NotBlank
+        @NotNull
         LocalDate data_de_publicacao,
 
-        Editora editora
+        Long editora_id
 
 ) {
 }

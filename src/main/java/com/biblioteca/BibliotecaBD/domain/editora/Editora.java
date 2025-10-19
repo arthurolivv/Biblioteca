@@ -1,6 +1,7 @@
 package com.biblioteca.BibliotecaBD.domain.editora;
 
 import com.biblioteca.BibliotecaBD.domain.livro.Livro;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +27,7 @@ public class Editora {
     private String endereco;
 
     @OneToMany(mappedBy = "editora", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Livro> livros;
 
     public Editora(EditoraDto editoraDto) {

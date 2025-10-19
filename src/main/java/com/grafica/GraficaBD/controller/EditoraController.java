@@ -1,6 +1,5 @@
 package com.grafica.GraficaBD.controller;
 
-import com.biblioteca.BibliotecaBD.domain.editora.*;
 import com.grafica.GraficaBD.domain.editora.*;
 import com.grafica.GraficaBD.domain.livro.Livro;
 import com.grafica.GraficaBD.repository.EditoraRepository;

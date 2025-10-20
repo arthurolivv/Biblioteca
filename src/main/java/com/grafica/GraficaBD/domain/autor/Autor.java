@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "Autor")
@@ -24,6 +25,13 @@ public class Autor {
 
     private String endereco;
 
-    @OneToMany(mappedBy = "autor")
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.PERSIST)
     private List<Escreve> escreve;
+
+    public Autor(CriarAutorDto criarAutorDto) {
+        this.rg = criarAutorDto.RG();
+        this.nome = criarAutorDto.nome();
+        this.endereco = criarAutorDto.endereco();
+        this.escreve = new ArrayList<>();
+    }
 }

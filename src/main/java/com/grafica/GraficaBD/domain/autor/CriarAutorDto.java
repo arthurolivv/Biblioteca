@@ -2,7 +2,9 @@ package com.grafica.GraficaBD.domain.autor;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record AutorDto(
+import java.util.List;
+
+public record CriarAutorDto(
 
         @NotBlank
         String RG,
@@ -11,6 +13,8 @@ public record AutorDto(
         String nome,
 
         @NotBlank
-        String endereco
+        String endereco,
+
+        List<String> livrosIsbn
 ) {
 }

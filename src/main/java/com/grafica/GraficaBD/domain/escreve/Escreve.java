@@ -27,6 +27,4 @@ public class Escreve {
     @MapsId("rg")
     @JoinColumn(name = "RG")
     private Autor autor;
-
-
 }

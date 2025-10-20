@@ -18,8 +18,8 @@ public class EditoraController {
     @Autowired
     private EditoraRepository editoraRepository;
 
-    @Autowired
-    private LivroRepository livroRepository;
+//    @Autowired
+//    private LivroRepository livroRepository;
 
     @PostMapping
     @Transactional

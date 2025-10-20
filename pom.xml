@@ -11,7 +11,7 @@
 	<groupId>com.biblioteca</groupId>
 	<artifactId>GraficaBD</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>BibliotecaBD</name>
+	<name>GraficaBD</name>
 	<description>Trabalho da disciplina Banco de Dados I - Bacharelado em Sistemas de Informação (Universidade de São Paulo)</description>
 	<url/>
 	<licenses>

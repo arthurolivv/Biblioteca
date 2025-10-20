@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Table(name = "Livros")
-@Entity(name = "Livro")
+@Entity(name = "Livros")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -52,4 +52,5 @@ public class Livro {
         this.titulo = livroDto.titulo();
         this.data_de_publicacao = livroDto.data_de_publicacao();
     }
+
 }

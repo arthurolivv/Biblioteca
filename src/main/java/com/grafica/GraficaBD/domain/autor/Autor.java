@@ -25,7 +25,7 @@ public class Autor {
 
     private String endereco;
 
-    @OneToMany(mappedBy = "autor", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Escreve> escreve;
 
     public Autor(CriarAutorDto criarAutorDto) {

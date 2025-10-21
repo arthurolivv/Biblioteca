@@ -20,11 +20,11 @@ public class Escreve {
 
     @ManyToOne
     @MapsId("isbn")
-    @JoinColumn(name = "ISBN")
+    @JoinColumn(name = "ISBN", nullable = false)
     private Livro livro;
 
     @ManyToOne
     @MapsId("rg")
-    @JoinColumn(name = "RG")
+    @JoinColumn(name = "RG", nullable = false)
     private Autor autor;
 }

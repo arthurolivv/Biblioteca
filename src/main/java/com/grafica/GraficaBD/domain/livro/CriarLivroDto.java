@@ -4,8 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
+import java.util.List;
 
-public record LivroDto(
+public record CriarLivroDto(
 
         @NotBlank
         String ISBN,
@@ -16,7 +17,10 @@ public record LivroDto(
         @NotNull
         LocalDate data_de_publicacao,
 
-        Long editora_id
+        Long editora_id,
+
+        List<String> autores_rg
 
 ) {
+
 }

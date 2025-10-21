@@ -54,17 +54,44 @@ public class AutorController {
 
     @PostMapping
     @Transactional
-    public void adicionar(@RequestBody @Valid CriarAutorDto criarAutorDto) {
+    public void cadastrar(@RequestBody @Valid CriarAutorDto criarAutorDto) {
 
-        var autor = new Autor(criarAutorDto);
+        var novoAutor = new Autor(criarAutorDto);
 
-        if (autor.getEscreve() == null) {
-            autor.setEscreve(new ArrayList<>());
+        if (criarAutorDto.livros_isbn() != null) {
+            for (String isbn : criarAutorDto.livros_isbn()) {
+
+                var livro = livroRepository.findById(isbn)
+                        .orElseThrow(() -> new RuntimeException("Livro não Encontrado"));
+
+                var escreve = new Escreve(new EscreveId(isbn, novoAutor.getRg()),
+                        livro,
+                        novoAutor);
+
+                novoAutor.getEscreve().add(escreve);
+            }
+        }
+        autorRepository.save(novoAutor);
+    }
+
+    @PutMapping("/{rg}")
+    @Transactional
+    public void atualizar(@PathVariable String rg, @RequestBody @Valid AtualizarNomeEnderecoLivroAutorDto atualizarNomeEnderecoAutorLivroDto){
+
+        Autor autor = autorRepository.findById(rg)
+                .orElseThrow(() -> new RuntimeException("Autor não encontrado"));
+
+        if (atualizarNomeEnderecoAutorLivroDto.nome() != null && !atualizarNomeEnderecoAutorLivroDto.nome().isBlank()) {
+            autor.setNome(atualizarNomeEnderecoAutorLivroDto.nome());
         }
 
-        if(criarAutorDto.livrosIsbn() != null) {
-            for(String isbn : criarAutorDto.livrosIsbn()) {
-                System.out.println("ISBN recebido: '" + isbn + "'");
+        if (atualizarNomeEnderecoAutorLivroDto.endereco() != null && !atualizarNomeEnderecoAutorLivroDto.endereco().isBlank()) {
+            autor.setEndereco(atualizarNomeEnderecoAutorLivroDto.endereco());
+        }
+
+        if(atualizarNomeEnderecoAutorLivroDto.addLivrosIsbn() != null && !atualizarNomeEnderecoAutorLivroDto.addLivrosIsbn().isEmpty()) {
+
+            for(String isbn : atualizarNomeEnderecoAutorLivroDto.addLivrosIsbn()){
 
                 var livro = livroRepository.findById(isbn)
                         .orElseThrow(() -> new RuntimeException("Livro não Encontrado"));
@@ -77,23 +104,16 @@ public class AutorController {
             }
         }
 
-        autorRepository.save(autor);
+        if(atualizarNomeEnderecoAutorLivroDto.remLivrosIsbn() != null && !atualizarNomeEnderecoAutorLivroDto.remLivrosIsbn().isEmpty()) {
 
-    }
+            for(String isbn : atualizarNomeEnderecoAutorLivroDto.remLivrosIsbn()){
 
-    @PutMapping("/{rg}")
-    @Transactional
-    public void atualizarEndereco(@PathVariable String rg, @RequestBody @Valid AtualizarNomeEnderecoAutorDto atualizarNomeEnderecoAutorDto){
+                var escreve = escreveRepository.findById(new EscreveId(isbn, autor.getRg()))
+                        .orElseThrow(() -> new RuntimeException("Livro não Encontrado"));
 
-        Autor autor = autorRepository.findById(rg)
-                .orElseThrow(() -> new RuntimeException("Autor não encontrado"));
-
-        if (atualizarNomeEnderecoAutorDto.nome() != null && !atualizarNomeEnderecoAutorDto.nome().isBlank()) {
-            autor.setNome(atualizarNomeEnderecoAutorDto.nome());
-        }
-
-        if (atualizarNomeEnderecoAutorDto.endereco() != null && !atualizarNomeEnderecoAutorDto.endereco().isBlank()) {
-            autor.setEndereco(atualizarNomeEnderecoAutorDto.endereco());
+                escreve.setAutor(null);
+                autor.getEscreve().remove(escreve);
+            }
         }
 
         autorRepository.save(autor);
@@ -101,7 +121,7 @@ public class AutorController {
 
     @DeleteMapping("{rg}")
     @Transactional
-    public void adicionar(@PathVariable String rg) {
+    public void deletar(@PathVariable String rg) {
 
         var autor = autorRepository.getReferenceById(rg);
         autorRepository.delete(autor);

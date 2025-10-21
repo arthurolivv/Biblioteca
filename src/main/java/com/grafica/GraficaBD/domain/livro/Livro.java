@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "Livros")
@@ -34,7 +35,7 @@ public class Livro {
     @JsonIgnore
     private Editora editora;
 
-    @OneToMany(mappedBy = "livro", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "livro", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Escreve> escreve;
 
@@ -47,10 +48,12 @@ public class Livro {
         this.isbn = livroIsbnDto.ISBN();
     }
 
-    public Livro(LivroDto livroDto) {
+    public Livro(CriarLivroDto livroDto) {
         this.isbn = livroDto.ISBN();
         this.titulo = livroDto.titulo();
         this.data_de_publicacao = livroDto.data_de_publicacao();
+        this.escreve = new ArrayList<>();
+        this.imprime = new ArrayList<>();
     }
 
 }

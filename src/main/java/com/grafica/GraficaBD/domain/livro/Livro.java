@@ -48,7 +48,7 @@ public class Livro {
         this.isbn = livroIsbnDto.ISBN();
     }
 
-    public Livro(CriarLivroDto livroDto) {
+    public Livro(CadastrarLivroDto livroDto) {
         this.isbn = livroDto.ISBN();
         this.titulo = livroDto.titulo();
         this.data_de_publicacao = livroDto.data_de_publicacao();

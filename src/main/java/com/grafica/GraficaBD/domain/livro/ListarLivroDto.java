@@ -1,6 +1,7 @@
 package com.grafica.GraficaBD.domain.livro;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record ListarLivroDto(
 
@@ -11,12 +12,12 @@ public record ListarLivroDto(
         LocalDate data_de_publicacao,
 
         Long editora_id
-
 ) {
     public ListarLivroDto (Livro livro){
         this(   livro.getIsbn(),
                 livro.getTitulo(),
                 livro.getData_de_publicacao(),
-                livro.getEditora() != null ? livro.getEditora().getId() : null);
+                livro.getEditora() != null ? livro.getEditora().getId() : null
+                );
     }
 }

@@ -43,10 +43,10 @@ public class AutorController {
 
         var autor = autorRepository.getReferenceById(rg);
 
-        List<ListarLivroDto> livros = autor.getEscreve()
+        List<DetalharLivroSemAutorDto> livros = autor.getEscreve()
                 .stream()
                 .map(Escreve::getLivro)
-                .map(ListarLivroDto::new) //converte pra dto
+                .map(DetalharLivroSemAutorDto::new) //converte pra dto
                 .toList();
 
         return new DetalharAutorDto(autor.getNome(), autor.getEndereco(), livros);
@@ -109,7 +109,7 @@ public class AutorController {
             for(String isbn : atualizarNomeEnderecoAutorLivroDto.remLivrosIsbn()){
 
                 var escreve = escreveRepository.findById(new EscreveId(isbn, autor.getRg()))
-                        .orElseThrow(() -> new RuntimeException("Livro não Encontrado"));
+                        .orElseThrow(() -> new RuntimeException("Relação entre autor e livro não encontrada"));
 
                 escreve.setAutor(null);
                 autor.getEscreve().remove(escreve);
@@ -123,7 +123,10 @@ public class AutorController {
     @Transactional
     public void deletar(@PathVariable String rg) {
 
-        var autor = autorRepository.getReferenceById(rg);
+        var autor = autorRepository.findById(rg)
+                .orElseThrow(()->new RuntimeException("Autor não Encontrado!"));
+
+
         autorRepository.delete(autor);
     }
 }

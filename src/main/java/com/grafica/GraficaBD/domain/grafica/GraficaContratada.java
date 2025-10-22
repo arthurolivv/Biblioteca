@@ -14,6 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@PrimaryKeyJoinColumn(name = "grafica_id")
 public class GraficaContratada extends Grafica{
 
     @Column(nullable = false)

@@ -22,4 +22,9 @@ public class GraficaContratada extends Grafica{
 
     @OneToMany(mappedBy = "grafica_cont")
     private List<Contrato> contrato;
+
+    public GraficaContratada(CadastrarGraficaDto cadastrarGraficaDto) {
+        super(cadastrarGraficaDto);
+        this.endereco = cadastrarGraficaDto.endereco();
+    }
 }

@@ -13,5 +13,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @PrimaryKeyJoinColumn(name = "grafica_id")
+
 public class GraficaParticular extends Grafica{
+
+    public GraficaParticular(CadastrarGraficaDto cadastrarGraficaDto) {
+        super(cadastrarGraficaDto);
+    }
 }

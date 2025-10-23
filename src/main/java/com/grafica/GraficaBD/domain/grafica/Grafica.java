@@ -26,4 +26,8 @@ public class Grafica {
 
     @OneToMany(mappedBy = "grafica")
     private List<Imprime> imprime;
+
+    public Grafica(CadastrarGraficaDto cadastrarGraficaDto) {
+        this.nome = cadastrarGraficaDto.nome();
+    }
 }

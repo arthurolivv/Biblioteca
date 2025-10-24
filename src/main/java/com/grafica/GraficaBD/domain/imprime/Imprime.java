@@ -26,7 +26,7 @@ public class Imprime {
 
     @ManyToOne
     @MapsId("lisbn")
-    @JoinColumn(name = "lsbn")
+    @JoinColumn(name = "lisbn")
     private Livro livro;
 
     @ManyToOne

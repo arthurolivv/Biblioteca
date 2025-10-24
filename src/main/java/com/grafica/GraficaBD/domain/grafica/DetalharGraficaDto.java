@@ -13,4 +13,10 @@ public record DetalharGraficaDto(
         List<DetalharImpressoesGraficaDto> impressoes
 ) {
 
+    public DetalharGraficaDto (Grafica grafica, List<DetalharImpressoesGraficaDto> detalharImpressoesDto) {
+        this(grafica.getNome(),
+                grafica instanceof GraficaContratada ? "Contratada" : grafica instanceof GraficaParticular ? "Particular"  : "Tipo Desconhecido",
+                grafica instanceof GraficaContratada ? ((GraficaContratada) grafica).getEndereco() : null,
+                detalharImpressoesDto);
+    }
 }

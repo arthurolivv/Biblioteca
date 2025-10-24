@@ -33,11 +33,21 @@ public class GraficaController {
     @GetMapping("/{id}/detalhar")
     public DetalharGraficaDto detalhar(@PathVariable Long id){
 
-        var grafica = graficaRepository.findById(id);
+        var grafica = graficaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Gráfica Não Encontrada!"));
 
-        List<DetalharImpressoesGraficaDto> impressoes = grafica.get().getImprime()
+        List<DetalharImpressoesGraficaDto> impressoes = grafica.getImprime()
                 .stream()
-                .map(
+                .map(imprime -> new DetalharImpressoesGraficaDto(
+                        grafica.getNome(),
+                        imprime.getLivro().getIsbn(),
+                        imprime.getLivro().getTitulo(),
+                        imprime.getNto_copias(),
+                        imprime.getData_entrega()
+                ))
+                .toList();
+
+        return new DetalharGraficaDto(grafica, impressoes);
     }
 
     @PostMapping

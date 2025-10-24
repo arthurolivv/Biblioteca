@@ -6,7 +6,9 @@ public record ListarTodaGraficaDto(
 
         String nome,
 
-        String tipo
+        String tipo,
+
+        String endereco
 ) {
     public ListarTodaGraficaDto(Grafica grafica){
         this(
@@ -14,7 +16,8 @@ public record ListarTodaGraficaDto(
                 grafica.getNome(),
                 grafica instanceof GraficaParticular ? "Particular"
                         : grafica instanceof GraficaContratada ? "Contratada"
-                        : "Desconhecido"
+                        : "Desconhecido",
+                grafica instanceof GraficaContratada contratada ? contratada.getEndereco() : null
         );
     }
 }

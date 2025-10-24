@@ -1,11 +1,10 @@
 package com.grafica.GraficaBD.controller;
 
 import com.grafica.GraficaBD.domain.grafica.*;
-import com.grafica.GraficaBD.domain.imprime.Imprime;
-import com.grafica.GraficaBD.domain.imprime.ImprimeId;
-import com.grafica.GraficaBD.repository.GraficaService;
+import com.grafica.GraficaBD.repository.GraficaRepository;
 import com.grafica.GraficaBD.repository.LivroRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,14 +15,14 @@ import java.util.List;
 public class GraficaController {
 
     @Autowired
-    private GraficaService graficaService;
+    private GraficaRepository graficaRepository;
     @Autowired
     private LivroRepository livroRepository;
 
     @GetMapping
     public List<ListarTodaGraficaDto> listarTodas(){
 
-        List<ListarTodaGraficaDto> graficas = graficaService.findAll()
+        List<ListarTodaGraficaDto> graficas = graficaRepository.findAll()
                 .stream()
                 .map(ListarTodaGraficaDto::new)
                 .toList();
@@ -31,26 +30,44 @@ public class GraficaController {
         return graficas;
     }
 
-    @PostMapping
-    @Transactional
-    public void cadastrar(CadastrarGraficaDto cadastrarGraficaDto){
+    @GetMapping("/{id}/detalhar")
+    public DetalharGraficaDto detalhar(@PathVariable Long id){
 
-        if(cadastrarGraficaDto.tipoGrafica().equals(TipoGrafica.PARTICULAR)){
+        var grafica = graficaRepository.findById(id);
 
-        }
-
-        if(cadastrarGraficaDto.tipoGrafica().equals(TipoGrafica.CONTRATADA)){
-
-        }
-
-
-        graficaService.save(novaGrafica);
+        List<DetalharImpressoesGraficaDto> impressoes = grafica.get().getImprime()
+                .stream()
+                .map(
     }
 
-    @PutMapping("/{id}")
+    @PostMapping
+    @Transactional
+    public void cadastrar(@RequestBody @Valid CadastrarGraficaDto cadastrarGraficaDto){
+
+        Grafica novaGrafica = null;
+
+        if(cadastrarGraficaDto.tipo_grafica().equals(TipoGrafica.PARTICULAR)){
+            if(cadastrarGraficaDto.endereco() != null && !cadastrarGraficaDto.endereco().isBlank()){
+                throw new IllegalArgumentException("Endereço não deve ser preenchido para gráficas particulares.");
+            }
+            novaGrafica = new GraficaParticular(cadastrarGraficaDto);
+        }
+
+        else if(cadastrarGraficaDto.tipo_grafica().equals(TipoGrafica.CONTRATADA)){
+            if(cadastrarGraficaDto.endereco() == null || cadastrarGraficaDto.endereco().isBlank()){
+                throw new IllegalArgumentException("Endereço deve ser preenchido para gráficas contratadas.");
+            }
+                novaGrafica = new GraficaContratada(cadastrarGraficaDto);
+        }
+        graficaRepository.save(novaGrafica);
+    }
+
+
+
+    @PutMapping("/{id}/")
     @Transactional
     public void atualizar(@PathVariable Long id, @RequestBody AtualizarNomeTipoGraficaDto atualizarNomeTipoGraficaDto){
 
-        var grafica = graficaService.findById(id);
+        var grafica = graficaRepository.findById(id);
     }
 }

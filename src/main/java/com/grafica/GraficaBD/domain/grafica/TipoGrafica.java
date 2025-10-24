@@ -1,5 +1,6 @@
 package com.grafica.GraficaBD.domain.grafica;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ public enum TipoGrafica {
         this.nomeCompleto = nomeCompleto;
     }
 
+    @JsonCreator
     public static TipoGrafica fromString(String valor) {
         if (valor == null) return null;
 
@@ -25,9 +27,11 @@ public enum TipoGrafica {
         //desse modo, ele se encaixa automaticamente em qualquer definicao
         String normalizado = valor.trim().toUpperCase();
 
-        for (TipoGrafica tipoGrafica : values()) {
-            if (tipoGrafica.sigla.equals(normalizado) || tipoGrafica.nomeCompleto.equals(normalizado)) {
-                return tipoGrafica;
+        for (TipoGrafica tipo_grafica : values()) {
+            if (tipo_grafica.sigla.equals(normalizado) ||
+                    tipo_grafica.nomeCompleto.toUpperCase().equals(normalizado) ||
+                    tipo_grafica.name().equals(normalizado)) {
+                 return tipo_grafica;
             }
         }
 

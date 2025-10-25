@@ -13,8 +13,6 @@ public record CriarAutorDto(
         String nome,
 
         @NotBlank
-        String endereco,
-
-        List<String> livros_isbn
+        String endereco
 ) {
 }

@@ -97,7 +97,7 @@ public class GraficaController {
         graficaRepository.save(novaGrafica);
     }
 
-    @PutMapping("/{id}/adicionar_contrato")
+    @PostMapping("/{id}/adicionar_contrato")
     @Transactional
     public void adicionarContrato(@PathVariable Long id, @RequestBody @Valid adicionarContratoNaGraficaDto adicionarContratoNaGraficaDto){
 

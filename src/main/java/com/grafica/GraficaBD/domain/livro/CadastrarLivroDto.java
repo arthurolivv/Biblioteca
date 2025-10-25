@@ -15,12 +15,7 @@ public record CadastrarLivroDto(
         String titulo,
 
         @NotNull
-        LocalDate data_de_publicacao,
-
-        Long editora_id,
-
-        List<String> autores_rg
-
+        LocalDate data_de_publicacao
 ) {
 
 }

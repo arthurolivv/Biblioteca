@@ -1,5 +1,6 @@
 package com.grafica.GraficaBD.controller;
 
+import com.grafica.GraficaBD.domain.autor.LivrosPorIsbnDto;
 import com.grafica.GraficaBD.domain.editora.*;
 import com.grafica.GraficaBD.domain.livro.Livro;
 import com.grafica.GraficaBD.repository.EditoraRepository;
@@ -17,9 +18,8 @@ public class EditoraController {
 
     @Autowired
     private EditoraRepository editoraRepository;
-
-//    @Autowired
-//    private LivroRepository livroRepository;
+    @Autowired
+    private LivroRepository livroRepository;
 
     @PostMapping
     @Transactional
@@ -29,27 +29,60 @@ public class EditoraController {
         editoraRepository.save(editora);
     }
 
-//    @PutMapping("/{id}")
-//    @Transactional
-//    public void adicionarLivro(@PathVariable Long id, @RequestBody @Valid LivroIsbnDto livroIsbnDto){
-//
-//        var editora = editoraRepository.getReferenceById(id);
-//
-//        var livro = livroRepository.findById(livroIsbnDto.ISBN())
-//                .orElseThrow(() -> new RuntimeException("Livro Não Encontrado!"));
-//
-//        livro.setEditora(editora);
-//
-//        livroRepository.save(livro);
-//    }
+    @PostMapping("/{id}/livro")
+    @Transactional
+    public void adicionarLivro(@PathVariable Long id, @RequestBody @Valid LivrosPorIsbnDto livrosPorIsbnDto){
+
+        var editora = editoraRepository.findById(id)
+                .orElseThrow(()->new RuntimeException("Editora não encontrada!"));
+
+        for (String isbn : livrosPorIsbnDto.isbns()){
+
+            var novoLivro = livroRepository.findById(isbn)
+                    .orElseThrow(()->new RuntimeException("Livro não encontrado!"));
+
+            novoLivro.setEditora(editora);
+            editora.getLivros().add(novoLivro);
+        }
+
+        editoraRepository.save(editora);
+    }
+
+    @DeleteMapping("/{id}/livro")
+    @Transactional
+    public void deletarLivro(@PathVariable Long id, @RequestBody @Valid LivrosPorIsbnDto livrosPorIsbnDto){
+
+        var editora = editoraRepository.findById(id)
+                .orElseThrow(()->new RuntimeException("Editora não encontrada!"));
+
+        for (String isbn : livrosPorIsbnDto.isbns()){
+
+            var livro = livroRepository.findById(isbn)
+                    .orElseThrow(()->new RuntimeException("Livro não encontrado!"));
+
+            if(!livro.getEditora().getId().equals(id)){
+                throw new RuntimeException("Livro '" + isbn + "' não pertence a editora '" + id + "'");
+            }
+
+            livro.setEditora(null);
+            editora.getLivros().remove(livro);
+        }
+
+        editoraRepository.save(editora);
+    }
 
     @PutMapping("/{id}")
     @Transactional
-    public void atualizarEndereco(@PathVariable Long id, @RequestBody @Valid AtualizarEnderecoEditoraDto atualizarEnderecoEditoraDto){
+    public void atualizar(@PathVariable Long id, @RequestBody @Valid AtualizarNomeEnderecoDaEditoraDto atualizarNomeEnderecoDaEditoraDto) {
 
         var editora = editoraRepository.getReferenceById(id);
 
-        editora.setEndereco(atualizarEnderecoEditoraDto.endereco());
+        if (atualizarNomeEnderecoDaEditoraDto.nome() != null && !atualizarNomeEnderecoDaEditoraDto.nome().isBlank()) {
+            editora.setNome(atualizarNomeEnderecoDaEditoraDto.nome());
+        }
+        if (atualizarNomeEnderecoDaEditoraDto.endereco() != null && !atualizarNomeEnderecoDaEditoraDto.endereco().isBlank()) {
+            editora.setEndereco(atualizarNomeEnderecoDaEditoraDto.endereco());
+        }
 
         editoraRepository.save(editora);
     }

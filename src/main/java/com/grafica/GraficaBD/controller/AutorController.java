@@ -3,8 +3,6 @@ package com.grafica.GraficaBD.controller;
 import com.grafica.GraficaBD.domain.autor.*;
 import com.grafica.GraficaBD.domain.escreve.Escreve;
 import com.grafica.GraficaBD.domain.escreve.EscreveId;
-import com.grafica.GraficaBD.domain.livro.ListarLivroDto;
-import com.grafica.GraficaBD.domain.livro.Livro;
 import com.grafica.GraficaBD.repository.AutorRepository;
 import com.grafica.GraficaBD.repository.EscreveRepository;
 import com.grafica.GraficaBD.repository.LivroRepository;
@@ -13,7 +11,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -57,26 +54,12 @@ public class AutorController {
     public void cadastrar(@RequestBody @Valid CriarAutorDto criarAutorDto) {
 
         var novoAutor = new Autor(criarAutorDto);
-
-        if (criarAutorDto.livros_isbn() != null) {
-            for (String isbn : criarAutorDto.livros_isbn()) {
-
-                var livro = livroRepository.findById(isbn)
-                        .orElseThrow(() -> new RuntimeException("Livro não Encontrado"));
-
-                var escreve = new Escreve(new EscreveId(isbn, novoAutor.getRg()),
-                        livro,
-                        novoAutor);
-
-                novoAutor.getEscreve().add(escreve);
-            }
-        }
         autorRepository.save(novoAutor);
     }
 
     @PutMapping("/{rg}")
     @Transactional
-    public void atualizar(@PathVariable String rg, @RequestBody @Valid AtualizarNomeEnderecoLivroAutorDto atualizarNomeEnderecoAutorLivroDto){
+    public void atualizar(@PathVariable String rg, @RequestBody @Valid AtualizarNomeEnderecoDoAutorDto atualizarNomeEnderecoAutorLivroDto){
 
         Autor autor = autorRepository.findById(rg)
                 .orElseThrow(() -> new RuntimeException("Autor não encontrado"));
@@ -88,25 +71,42 @@ public class AutorController {
         if (atualizarNomeEnderecoAutorLivroDto.endereco() != null && !atualizarNomeEnderecoAutorLivroDto.endereco().isBlank()) {
             autor.setEndereco(atualizarNomeEnderecoAutorLivroDto.endereco());
         }
+        autorRepository.save(autor);
+    }
 
-        if(atualizarNomeEnderecoAutorLivroDto.addLivrosIsbn() != null && !atualizarNomeEnderecoAutorLivroDto.addLivrosIsbn().isEmpty()) {
+    @PostMapping("/{rg}/livro")
+    @Transactional
+    public void adicionarLivro(@PathVariable String rg, @RequestBody @Valid LivrosPorIsbnDto livrosPorIsbnDto){
 
-            for(String isbn : atualizarNomeEnderecoAutorLivroDto.addLivrosIsbn()){
+        var autor = autorRepository.findById(rg)
+                .orElseThrow(()->new RuntimeException("Autor não encontrado!"));
 
-                var livro = livroRepository.findById(isbn)
+        for(String isbn : livrosPorIsbnDto.isbns()){
+
+            var livro = livroRepository.findById(isbn)
                         .orElseThrow(() -> new RuntimeException("Livro não Encontrado"));
 
-                var escreve = new Escreve(new EscreveId(isbn, autor.getRg()),
+            var escreve = new Escreve(new EscreveId(isbn, autor.getRg()),
                         livro,
                         autor);
 
-                autor.getEscreve().add(escreve);
-            }
+            autor.getEscreve().add(escreve);
         }
 
-        if(atualizarNomeEnderecoAutorLivroDto.remLivrosIsbn() != null && !atualizarNomeEnderecoAutorLivroDto.remLivrosIsbn().isEmpty()) {
+        autorRepository.save(autor);
 
-            for(String isbn : atualizarNomeEnderecoAutorLivroDto.remLivrosIsbn()){
+    }
+
+    @DeleteMapping("/{rg}/livro")
+    @Transactional
+    public void deletarLivro(@PathVariable String rg, @RequestBody @Valid LivrosPorIsbnDto livrosPorIsbnDto){
+
+        var autor = autorRepository.findById(rg)
+                .orElseThrow(()->new RuntimeException("Autor não encontrado!"));
+
+        if(livrosPorIsbnDto.isbns() != null && !livrosPorIsbnDto.isbns().isEmpty()) {
+
+            for(String isbn : livrosPorIsbnDto.isbns()){
 
                 var escreve = escreveRepository.findById(new EscreveId(isbn, autor.getRg()))
                         .orElseThrow(() -> new RuntimeException("Relação entre autor e livro não encontrada"));
@@ -117,9 +117,10 @@ public class AutorController {
         }
 
         autorRepository.save(autor);
+
     }
 
-    @DeleteMapping("{rg}")
+    @DeleteMapping("/{rg}")
     @Transactional
     public void deletar(@PathVariable String rg) {
 

@@ -3,8 +3,9 @@ package com.grafica.GraficaBD.domain.editora;
 import jakarta.validation.constraints.NotBlank;
 
 
-public record AtualizarEnderecoEditoraDto(
+public record AtualizarNomeEnderecoDaEditoraDto(
 
-    @NotBlank
+    String nome,
+
     String endereco
 ){}

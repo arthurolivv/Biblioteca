@@ -1,6 +1,7 @@
 package com.grafica.GraficaBD.controller;
 
 import com.grafica.GraficaBD.domain.grafica.*;
+import com.grafica.GraficaBD.repository.ContratoRepository;
 import com.grafica.GraficaBD.repository.GraficaRepository;
 import com.grafica.GraficaBD.repository.LivroRepository;
 import jakarta.transaction.Transactional;
@@ -18,7 +19,7 @@ public class GraficaController {
     @Autowired
     private GraficaRepository graficaRepository;
     @Autowired
-    private LivroRepository livroRepository;
+    private ContratoRepository contratoRepository;
 
     @GetMapping
     public List<ListarTodaGraficaDto> listarTodas(){
@@ -96,12 +97,23 @@ public class GraficaController {
         graficaRepository.save(novaGrafica);
     }
 
-
-
-    @PutMapping("/{id}/")
+    @PutMapping("/{id}/adicionar_contrato")
     @Transactional
-    public void atualizar(@PathVariable Long id, @RequestBody AtualizarNomeTipoGraficaDto atualizarNomeTipoGraficaDto){
+    public void adicionarContrato(@PathVariable Long id, @RequestBody @Valid adicionarContratoNaGraficaDto adicionarContratoNaGraficaDto){
 
-        var grafica = graficaRepository.findById(id);
+        var grafica = graficaRepository.findById(id)
+                .orElseThrow(()-> new RuntimeException("Gráfica Não Encontrada!"));
+
+        if(grafica instanceof GraficaParticular){
+            throw new IllegalArgumentException("Não é possível adicionar contratos para gráficas particulares.");
+        }
+
+        GraficaContratada graficaContratada = (GraficaContratada) grafica;
+
+        var contrato = new Contrato(adicionarContratoNaGraficaDto, graficaContratada);
+
+        graficaContratada.getContrato().add(contrato);
+
+        contratoRepository.save(contrato);
     }
 }

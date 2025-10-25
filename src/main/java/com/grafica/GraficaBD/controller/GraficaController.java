@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -47,7 +48,30 @@ public class GraficaController {
                 ))
                 .toList();
 
-        return new DetalharGraficaDto(grafica, impressoes);
+//        List<DetalharContratosDto> contratos;
+//
+//        if(grafica instanceof GraficaContratada graficaContratada){
+//            contratos = graficaContratada.getContrato()
+//                    .stream()
+//                    .map(contrato -> new DetalharContratosDto(
+//                            contrato.getId(),
+//                            contrato.getValor(),
+//                            contrato.getNome_responsavel()
+//                    ))
+//                    .toList();
+//        }
+//        else {
+//                contratos = List.of();
+//        }
+
+        List<DetalharContratosDto> contratos = (grafica instanceof GraficaContratada gc)
+                ? gc.getContrato()
+                .stream()
+                .map(c -> new DetalharContratosDto(c.getId(), c.getValor(), c.getNome_responsavel()))
+                .toList()
+                : List.of(); // caso seja Particular
+
+        return new DetalharGraficaDto(grafica, impressoes, contratos);
     }
 
     @PostMapping

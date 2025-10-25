@@ -10,13 +10,16 @@ public record DetalharGraficaDto(
 
         String endereco,
 
+        List<DetalharContratosDto> contratos,
+
         List<DetalharImpressoesGraficaDto> impressoes
 ) {
 
-    public DetalharGraficaDto (Grafica grafica, List<DetalharImpressoesGraficaDto> detalharImpressoesDto) {
+    public DetalharGraficaDto (Grafica grafica, List<DetalharImpressoesGraficaDto> detalharImpressoesDto, List<DetalharContratosDto> detalharContratoDto) {
         this(grafica.getNome(),
                 grafica instanceof GraficaContratada ? "Contratada" : grafica instanceof GraficaParticular ? "Particular"  : "Tipo Desconhecido",
                 grafica instanceof GraficaContratada ? ((GraficaContratada) grafica).getEndereco() : null,
+                detalharContratoDto,
                 detalharImpressoesDto);
     }
 }

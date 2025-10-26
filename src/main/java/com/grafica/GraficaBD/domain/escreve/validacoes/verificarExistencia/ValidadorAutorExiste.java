@@ -1,4 +1,4 @@
-package com.grafica.GraficaBD.domain.escreve.validacoes.criarEscreve;
+package com.grafica.GraficaBD.domain.escreve.validacoes.verificarExistencia;
 
 import com.grafica.GraficaBD.domain.autor.LivrosPorIsbnDto;
 import com.grafica.GraficaBD.repository.AutorRepository;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
-public class ValidadorAutorExiste implements ValidadorCriarEscreve {
+public class ValidadorAutorExiste implements ValidadorVerificarExistencia {
 
     @Autowired
     private AutorRepository autorRepository;

@@ -1,4 +1,4 @@
-package com.grafica.GraficaBD.domain.escreve.validacoes.criarEscreve;
+package com.grafica.GraficaBD.domain.escreve.validacoes.verificarExistencia;
 
 import com.grafica.GraficaBD.domain.autor.LivrosPorIsbnDto;
 import com.grafica.GraficaBD.repository.AutorRepository;
@@ -9,13 +9,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
-public class ValidadorRelacaoAutorELivrosExiste implements ValidadorCriarEscreve {
+public class ValidadorRelacaoAutorELivrosNaoExiste implements ValidadorVerificarExistencia {
 
     @Autowired
     private AutorRepository autorRepository;
-
-    @Autowired
-    private LivroRepository  livroRepository;
 
     @Autowired
     ValidadorAutorExiste validadorAutorExiste;
@@ -37,8 +34,8 @@ public class ValidadorRelacaoAutorELivrosExiste implements ValidadorCriarEscreve
                     .stream()
                     .anyMatch(e -> e.getLivro().getIsbn().equals(isbn));
 
-            if(jaExiste) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "A relação entre o autor '" + rg + "' e o livro '" + isbn + "' já existe!");
+            if(!jaExiste) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "A relação entre o autor '" + rg + "' e o livro '" + isbn + "' não existe!");
             }
         }
     }

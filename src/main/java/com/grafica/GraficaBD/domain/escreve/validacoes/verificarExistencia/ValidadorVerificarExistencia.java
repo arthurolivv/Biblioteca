@@ -1,8 +1,8 @@
-package com.grafica.GraficaBD.domain.escreve.validacoes.criarEscreve;
+package com.grafica.GraficaBD.domain.escreve.validacoes.verificarExistencia;
 
 import com.grafica.GraficaBD.domain.autor.LivrosPorIsbnDto;
 
-public interface ValidadorCriarEscreve {
+public interface ValidadorVerificarExistencia {
 
     void validar(String rg, LivrosPorIsbnDto livrosPorIsbnDto);
 

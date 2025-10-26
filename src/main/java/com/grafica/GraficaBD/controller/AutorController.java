@@ -26,9 +26,6 @@ public class AutorController {
     @Autowired
     private EscreveService escreveService;
 
-    @Autowired
-    private EscreveRepository escreveRepository;
-
     @PostMapping
     @Transactional
     public ResponseEntity cadastrar(@RequestBody @Valid CriarAutorDto criarAutorDto, UriComponentsBuilder uriBuilder) {
@@ -43,10 +40,20 @@ public class AutorController {
 
     @PostMapping("/{rg}/livro")
     @Transactional
-    public ResponseEntity vincularAutorELivros(@PathVariable String rg, @RequestBody @Valid LivrosPorIsbnDto livrosPorIsbnDto){
+    public ResponseEntity vincularAutorELivros(@PathVariable String rg, @RequestBody @Valid LivrosPorIsbnDto livrosPorIsbnDto, UriComponentsBuilder uriBuilder) {
 
         var dto = escreveService.vincularAutorELivros(rg, livrosPorIsbnDto);
-        return ResponseEntity.ok(dto);
+
+        // Montando a URI do recurso do autor atualizado
+        var location = uriBuilder
+                .path("/autor/{rg}")       // caminho do recurso principal (autor)
+                .buildAndExpand(rg)        // substitui {rg} pelo RG do autor
+                .toUri();
+
+        // Retorna 201 Created + Location header + DTO no corpo
+        return ResponseEntity
+                .created(location)
+                .body(dto);
     }
 
     @GetMapping
@@ -93,24 +100,10 @@ public class AutorController {
 
     @DeleteMapping("/{rg}/livro")
     @Transactional
-    public void deletarLivro(@PathVariable String rg, @RequestBody @Valid LivrosPorIsbnDto livrosPorIsbnDto){
+    public ResponseEntity desvincularAutorELivros(@PathVariable String rg, @RequestBody @Valid LivrosPorIsbnDto livrosPorIsbnDto){
 
-        var autor = autorRepository.findById(rg)
-                .orElseThrow(()->new RuntimeException("Autor não encontrado!"));
-
-        if(livrosPorIsbnDto.isbns() != null && !livrosPorIsbnDto.isbns().isEmpty()) {
-
-            for(String isbn : livrosPorIsbnDto.isbns()){
-
-                var escreve = escreveRepository.findById(new EscreveId(isbn, autor.getRg()))
-                        .orElseThrow(() -> new RuntimeException("Relação entre autor e livro não encontrada"));
-
-                escreve.setAutor(null);
-                autor.getEscreve().remove(escreve);
-            }
-        }
-
-        autorRepository.save(autor);
+        escreveService.desvincularAutorELivros(rg, livrosPorIsbnDto);
+        return ResponseEntity.noContent().build();
 
     }
 

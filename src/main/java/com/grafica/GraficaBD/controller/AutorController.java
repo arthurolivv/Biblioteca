@@ -6,10 +6,13 @@ import com.grafica.GraficaBD.domain.escreve.EscreveId;
 import com.grafica.GraficaBD.repository.AutorRepository;
 import com.grafica.GraficaBD.repository.EscreveRepository;
 import com.grafica.GraficaBD.repository.LivroRepository;
+import com.grafica.GraficaBD.service.EscreveService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -19,10 +22,32 @@ public class AutorController {
 
     @Autowired
     private AutorRepository autorRepository;
+
     @Autowired
-    private LivroRepository livroRepository;
+    private EscreveService escreveService;
+
     @Autowired
     private EscreveRepository escreveRepository;
+
+    @PostMapping
+    @Transactional
+    public ResponseEntity cadastrar(@RequestBody @Valid CriarAutorDto criarAutorDto, UriComponentsBuilder uriBuilder) {
+
+        var novoAutor = new Autor(criarAutorDto);
+        autorRepository.save(novoAutor);
+
+        var uri =  uriBuilder.path("/autor/{id}").buildAndExpand(novoAutor.getRg()).toUri();
+        //transforma os dados do usuario recem criado para uri
+        return ResponseEntity.created(uri).body(novoAutor);
+    }
+
+    @PostMapping("/{rg}/livro")
+    @Transactional
+    public ResponseEntity vincularAutorELivros(@PathVariable String rg, @RequestBody @Valid LivrosPorIsbnDto livrosPorIsbnDto){
+
+        var dto = escreveService.vincularAutorELivros(rg, livrosPorIsbnDto);
+        return ResponseEntity.ok(dto);
+    }
 
     @GetMapping
     public List<ListarAutorDto> listar() {
@@ -49,14 +74,6 @@ public class AutorController {
         return new DetalharAutorDto(autor.getNome(), autor.getEndereco(), livros);
     }
 
-    @PostMapping
-    @Transactional
-    public void cadastrar(@RequestBody @Valid CriarAutorDto criarAutorDto) {
-
-        var novoAutor = new Autor(criarAutorDto);
-        autorRepository.save(novoAutor);
-    }
-
     @PutMapping("/{rg}")
     @Transactional
     public void atualizar(@PathVariable String rg, @RequestBody @Valid AtualizarNomeEnderecoDoAutorDto atualizarNomeEnderecoAutorLivroDto){
@@ -72,29 +89,6 @@ public class AutorController {
             autor.setEndereco(atualizarNomeEnderecoAutorLivroDto.endereco());
         }
         autorRepository.save(autor);
-    }
-
-    @PostMapping("/{rg}/livro")
-    @Transactional
-    public void adicionarLivro(@PathVariable String rg, @RequestBody @Valid LivrosPorIsbnDto livrosPorIsbnDto){
-
-        var autor = autorRepository.findById(rg)
-                .orElseThrow(()->new RuntimeException("Autor não encontrado!"));
-
-        for(String isbn : livrosPorIsbnDto.isbns()){
-
-            var livro = livroRepository.findById(isbn)
-                        .orElseThrow(() -> new RuntimeException("Livro não Encontrado"));
-
-            var escreve = new Escreve(new EscreveId(isbn, autor.getRg()),
-                        livro,
-                        autor);
-
-            autor.getEscreve().add(escreve);
-        }
-
-        autorRepository.save(autor);
-
     }
 
     @DeleteMapping("/{rg}/livro")

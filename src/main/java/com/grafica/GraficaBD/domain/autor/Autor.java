@@ -25,13 +25,12 @@ public class Autor {
 
     private String endereco;
 
-    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Escreve> escreve;
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Escreve> escreve = new ArrayList<>();
 
     public Autor(CriarAutorDto criarAutorDto) {
         this.rg = criarAutorDto.RG();
         this.nome = criarAutorDto.nome();
         this.endereco = criarAutorDto.endereco();
-        this.escreve = new ArrayList<>();
     }
 }

@@ -15,4 +15,7 @@ public record CriarAutorDto(
         @NotBlank
         String endereco
 ) {
+    public CriarAutorDto (Autor autor){
+        this(autor.getRg(),autor.getNome(),autor.getEndereco());
+    }
 }

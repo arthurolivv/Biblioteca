@@ -6,6 +6,7 @@ import com.grafica.GraficaBD.domain.escreve.EscreveId;
 import com.grafica.GraficaBD.repository.AutorRepository;
 import com.grafica.GraficaBD.repository.EscreveRepository;
 import com.grafica.GraficaBD.repository.LivroRepository;
+import com.grafica.GraficaBD.service.AutorService;
 import com.grafica.GraficaBD.service.EscreveService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -26,16 +27,18 @@ public class AutorController {
     @Autowired
     private EscreveService escreveService;
 
+    @Autowired
+    private AutorService autorService;
+
+
     @PostMapping
     @Transactional
     public ResponseEntity cadastrar(@RequestBody @Valid CriarAutorDto criarAutorDto, UriComponentsBuilder uriBuilder) {
 
-        var novoAutor = new Autor(criarAutorDto);
-        autorRepository.save(novoAutor);
-
-        var uri =  uriBuilder.path("/autor/{id}").buildAndExpand(novoAutor.getRg()).toUri();
+        var dto = autorService.cadastrar(criarAutorDto);
+        var uri =  uriBuilder.path("/autor/{id}").buildAndExpand(criarAutorDto.RG()).toUri();
         //transforma os dados do usuario recem criado para uri
-        return ResponseEntity.created(uri).body(novoAutor);
+        return ResponseEntity.created(uri).body(dto);
     }
 
     @PostMapping("/{rg}/livro")
@@ -57,51 +60,29 @@ public class AutorController {
     }
 
     @GetMapping
-    public List<ListarAutorDto> listar() {
-
-        List<ListarAutorDto> autores = autorRepository.findAll()
-                .stream()
-                .map(ListarAutorDto::new)
-                .toList();
-
-        return autores;
+    public ResponseEntity listar() {
+        var lista = autorService.listar();
+        return ResponseEntity.ok(lista);
     }
 
     @GetMapping("{rg}")
-    public DetalharAutorDto detalhar(@PathVariable String rg) {
+    public ResponseEntity detalhar(@PathVariable String rg) {
 
-        var autor = autorRepository.getReferenceById(rg);
-
-        List<DetalharLivroSemAutorDto> livros = autor.getEscreve()
-                .stream()
-                .map(Escreve::getLivro)
-                .map(DetalharLivroSemAutorDto::new) //converte pra dto
-                .toList();
-
-        return new DetalharAutorDto(autor.getNome(), autor.getEndereco(), livros);
+        var autor = autorService.detalhar(rg);
+        return ResponseEntity.ok(autor);
     }
 
     @PutMapping("/{rg}")
     @Transactional
-    public void atualizar(@PathVariable String rg, @RequestBody @Valid AtualizarNomeEnderecoDoAutorDto atualizarNomeEnderecoAutorLivroDto){
+    public ResponseEntity atualizar(@PathVariable String rg, @RequestBody @Valid AtualizarNomeEnderecoDoAutorDto atualizarNomeEnderecoAutorLivroDto){
 
-        Autor autor = autorRepository.findById(rg)
-                .orElseThrow(() -> new RuntimeException("Autor não encontrado"));
-
-        if (atualizarNomeEnderecoAutorLivroDto.nome() != null && !atualizarNomeEnderecoAutorLivroDto.nome().isBlank()) {
-            autor.setNome(atualizarNomeEnderecoAutorLivroDto.nome());
-        }
-
-        if (atualizarNomeEnderecoAutorLivroDto.endereco() != null && !atualizarNomeEnderecoAutorLivroDto.endereco().isBlank()) {
-            autor.setEndereco(atualizarNomeEnderecoAutorLivroDto.endereco());
-        }
-        autorRepository.save(autor);
+        autorService.atualizar(rg, atualizarNomeEnderecoAutorLivroDto);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{rg}/livro")
     @Transactional
     public ResponseEntity desvincularAutorELivros(@PathVariable String rg, @RequestBody @Valid LivrosPorIsbnDto livrosPorIsbnDto){
-
         escreveService.desvincularAutorELivros(rg, livrosPorIsbnDto);
         return ResponseEntity.noContent().build();
 
@@ -109,12 +90,9 @@ public class AutorController {
 
     @DeleteMapping("/{rg}")
     @Transactional
-    public void deletar(@PathVariable String rg) {
+    public ResponseEntity deletar(@PathVariable String rg) {
 
-        var autor = autorRepository.findById(rg)
-                .orElseThrow(()->new RuntimeException("Autor não Encontrado!"));
-
-
-        autorRepository.delete(autor);
+        autorService.deletar(rg);
+        return ResponseEntity.noContent().build();
     }
 }

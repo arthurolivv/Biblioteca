@@ -1,4 +1,4 @@
-package com.grafica.GraficaBD.domain.escreve.validacoes.verificarExistencia;
+package com.grafica.GraficaBD.domain.escreve.validacoes.vinculacaoAutorELivros;
 
 import com.grafica.GraficaBD.domain.autor.LivrosPorIsbnDto;
 import com.grafica.GraficaBD.repository.LivroRepository;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
-public class ValidadorLivroExiste implements ValidadorVerificarExistencia {
+public class ValidadorLivroExiste implements ValidadorVinculacaoAutorELivros {
 
     @Autowired
     private LivroRepository livroRepository;

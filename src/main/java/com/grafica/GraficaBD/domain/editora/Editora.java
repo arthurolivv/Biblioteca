@@ -30,8 +30,8 @@ public class Editora {
     @JsonIgnore
     private List<Livro> livros;
 
-    public Editora(EditoraDto editoraDto) {
-        this.nome = editoraDto.nome();
-        this.endereco = editoraDto.endereco();
+    public Editora(CriarEditoraDto criarEditoraDto) {
+        this.nome = criarEditoraDto.nome();
+        this.endereco = criarEditoraDto.endereco();
     }
 }

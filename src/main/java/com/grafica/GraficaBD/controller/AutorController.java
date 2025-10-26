@@ -22,21 +22,17 @@ import java.util.List;
 public class AutorController {
 
     @Autowired
-    private AutorRepository autorRepository;
+    private AutorService autorService;
 
     @Autowired
     private EscreveService escreveService;
-
-    @Autowired
-    private AutorService autorService;
-
 
     @PostMapping
     @Transactional
     public ResponseEntity cadastrar(@RequestBody @Valid CriarAutorDto criarAutorDto, UriComponentsBuilder uriBuilder) {
 
         var dto = autorService.cadastrar(criarAutorDto);
-        var uri =  uriBuilder.path("/autor/{id}").buildAndExpand(criarAutorDto.RG()).toUri();
+        var uri =  uriBuilder.path("/autor/{rg}").buildAndExpand(criarAutorDto.RG()).toUri();
         //transforma os dados do usuario recem criado para uri
         return ResponseEntity.created(uri).body(dto);
     }

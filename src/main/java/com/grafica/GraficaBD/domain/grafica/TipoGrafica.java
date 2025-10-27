@@ -34,7 +34,6 @@ public enum TipoGrafica {
                  return tipo_grafica;
             }
         }
-
         throw new IllegalArgumentException("Estado inválido: " + valor);
     }
 

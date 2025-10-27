@@ -1,10 +1,10 @@
 package com.grafica.GraficaBD.domain.grafica;
 
+import com.grafica.GraficaBD.domain.contrato.Contrato;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jdk.jfr.ContentType;
 
-public record adicionarContratoNaGraficaDto(
+public record AdicionarContratoNaGraficaDto(
 
         @NotNull
         Double valor,
@@ -13,7 +13,7 @@ public record adicionarContratoNaGraficaDto(
         String nome_responsavel
 ) {
 
-    public adicionarContratoNaGraficaDto (Contrato contrato){
+    public AdicionarContratoNaGraficaDto(Contrato contrato){
         this(contrato.getValor(), contrato.getNome_responsavel());
     }
 }

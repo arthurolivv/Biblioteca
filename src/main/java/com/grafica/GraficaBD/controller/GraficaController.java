@@ -1,15 +1,19 @@
 package com.grafica.GraficaBD.controller;
 
+import com.grafica.GraficaBD.domain.contrato.Contrato;
+import com.grafica.GraficaBD.domain.contrato.DetalharContratosDeGraficaContradaDto;
 import com.grafica.GraficaBD.domain.grafica.*;
 import com.grafica.GraficaBD.repository.ContratoRepository;
 import com.grafica.GraficaBD.repository.GraficaRepository;
-import com.grafica.GraficaBD.repository.LivroRepository;
+import com.grafica.GraficaBD.service.ContratoService;
+import com.grafica.GraficaBD.service.GraficaService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -17,103 +21,57 @@ import java.util.List;
 public class GraficaController {
 
     @Autowired
-    private GraficaRepository graficaRepository;
+    private GraficaService graficaService;
+
     @Autowired
-    private ContratoRepository contratoRepository;
-
-    @GetMapping
-    public List<ListarTodaGraficaDto> listarTodas(){
-
-        List<ListarTodaGraficaDto> graficas = graficaRepository.findAll()
-                .stream()
-                .map(ListarTodaGraficaDto::new)
-                .toList();
-
-        return graficas;
-    }
-
-    @GetMapping("/{id}/detalhar")
-    public DetalharGraficaDto detalhar(@PathVariable Long id){
-
-        var grafica = graficaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Gráfica Não Encontrada!"));
-
-        List<DetalharImpressoesGraficaDto> impressoes = grafica.getImprime()
-                .stream()
-                .map(imprime -> new DetalharImpressoesGraficaDto(
-                        grafica.getNome(),
-                        imprime.getLivro().getIsbn(),
-                        imprime.getLivro().getTitulo(),
-                        imprime.getNto_copias(),
-                        imprime.getData_entrega()
-                ))
-                .toList();
-
-//        List<DetalharContratosDto> contratos;
-//
-//        if(grafica instanceof GraficaContratada graficaContratada){
-//            contratos = graficaContratada.getContrato()
-//                    .stream()
-//                    .map(contrato -> new DetalharContratosDto(
-//                            contrato.getId(),
-//                            contrato.getValor(),
-//                            contrato.getNome_responsavel()
-//                    ))
-//                    .toList();
-//        }
-//        else {
-//                contratos = List.of();
-//        }
-
-        List<DetalharContratosDto> contratos = (grafica instanceof GraficaContratada gc)
-                ? gc.getContrato()
-                .stream()
-                .map(c -> new DetalharContratosDto(c.getId(), c.getValor(), c.getNome_responsavel()))
-                .toList()
-                : List.of(); // caso seja Particular
-
-        return new DetalharGraficaDto(grafica, impressoes, contratos);
-    }
+    private ContratoService contratoService;
 
     @PostMapping
     @Transactional
-    public void cadastrar(@RequestBody @Valid CadastrarGraficaDto cadastrarGraficaDto){
+    public ResponseEntity cadastrar(@RequestBody @Valid CadastrarGraficaDto cadastrarGraficaDto, UriComponentsBuilder uriBuilder){
 
-        Grafica novaGrafica = null;
-
-        if(cadastrarGraficaDto.tipo_grafica().equals(TipoGrafica.PARTICULAR)){
-            if(cadastrarGraficaDto.endereco() != null && !cadastrarGraficaDto.endereco().isBlank()){
-                throw new IllegalArgumentException("Endereço não deve ser preenchido para gráficas particulares.");
-            }
-            novaGrafica = new GraficaParticular(cadastrarGraficaDto);
-        }
-
-        else if(cadastrarGraficaDto.tipo_grafica().equals(TipoGrafica.CONTRATADA)){
-            if(cadastrarGraficaDto.endereco() == null || cadastrarGraficaDto.endereco().isBlank()){
-                throw new IllegalArgumentException("Endereço deve ser preenchido para gráficas contratadas.");
-            }
-                novaGrafica = new GraficaContratada(cadastrarGraficaDto);
-        }
-        graficaRepository.save(novaGrafica);
+        var dto = graficaService.cadastrar(cadastrarGraficaDto);
+        var uri = uriBuilder.path("/grafica/{id}").buildAndExpand(dto.id()).toUri();
+        return ResponseEntity.created(uri).body(dto);
     }
 
-    @PostMapping("/{id}/adicionar_contrato")
+    @PostMapping("/{id}/contrato")
     @Transactional
-    public void adicionarContrato(@PathVariable Long id, @RequestBody @Valid adicionarContratoNaGraficaDto adicionarContratoNaGraficaDto){
+    public ResponseEntity adicionarContrato(@PathVariable Long id, @RequestBody @Valid AdicionarContratoNaGraficaDto adicionarContratoNaGraficaDto,
+    UriComponentsBuilder uriBuilder){
+        var dto =contratoService.adicionarContrato(id, adicionarContratoNaGraficaDto);
+        var uri = uriBuilder.path("/grafica/{id}/contrato/{id}").buildAndExpand(id, dto.id()).toUri();
+        return ResponseEntity.created(uri).body(dto);
 
-        var grafica = graficaRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Gráfica Não Encontrada!"));
+    }
 
-        if(grafica instanceof GraficaParticular){
-            throw new IllegalArgumentException("Não é possível adicionar contratos para gráficas particulares.");
-        }
+    @GetMapping
+    public ResponseEntity listar(){
 
-        GraficaContratada graficaContratada = (GraficaContratada) grafica;
+        var dto = graficaService.listar();
+        return ResponseEntity.ok(dto);
+    }
 
-        var contrato = new Contrato(adicionarContratoNaGraficaDto, graficaContratada);
+    @GetMapping("/{id}/detalhar")
+    public ResponseEntity detalhar(@PathVariable Long id){
 
-        graficaContratada.getContrato().add(contrato);
+        var dto = graficaService.detalhar(id);
+        return ResponseEntity.ok(dto);
 
-        contratoRepository.save(contrato);
+    }
+
+//    @DeleteMapping("/{id}/contrato/{id}")
+//    @Transactional
+//    public ResponseEntity deletarContrato(@PathVariable Long idGrafica, @PathVariable Long idContrato){
+//
+//
+//    }
+
+    @DeleteMapping("/id")
+    @Transactional
+    public ResponseEntity deletar(@PathVariable Long id){
+
+        graficaService.deletar(id);
+        return ResponseEntity.noContent().build();
     }
 }

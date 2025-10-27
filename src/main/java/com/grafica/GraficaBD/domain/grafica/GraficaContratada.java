@@ -1,5 +1,6 @@
 package com.grafica.GraficaBD.domain.grafica;
 
+import com.grafica.GraficaBD.domain.contrato.Contrato;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

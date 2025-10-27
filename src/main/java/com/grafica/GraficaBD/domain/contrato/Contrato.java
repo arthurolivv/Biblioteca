@@ -1,5 +1,7 @@
-package com.grafica.GraficaBD.domain.grafica;
+package com.grafica.GraficaBD.domain.contrato;
 
+import com.grafica.GraficaBD.domain.grafica.AdicionarContratoNaGraficaDto;
+import com.grafica.GraficaBD.domain.grafica.GraficaContratada;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +29,7 @@ public class Contrato {
     @JoinColumn(name = "grafica_cont_id")
     private GraficaContratada grafica_cont;
 
-    public Contrato(adicionarContratoNaGraficaDto adicionarContrato, GraficaContratada grafica_cont) {
+    public Contrato(AdicionarContratoNaGraficaDto adicionarContrato, GraficaContratada grafica_cont) {
         this.valor = adicionarContrato.valor();
         this.nome_responsavel = adicionarContrato.nome_responsavel();
         this.grafica_cont = grafica_cont;

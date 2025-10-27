@@ -1,6 +1,6 @@
-package com.grafica.GraficaBD.domain.grafica;
+package com.grafica.GraficaBD.domain.contrato;
 
-public record DetalharContratosDto(
+public record DetalharContratosDeGraficaContradaDto(
 
         Long id,
 
@@ -9,7 +9,7 @@ public record DetalharContratosDto(
         String nome_responsavel
 ) {
 
-    public DetalharContratosDto (Contrato contrato){
+    public DetalharContratosDeGraficaContradaDto(Contrato contrato){
         this(contrato.getId(), contrato.getValor(), contrato.getNome_responsavel());
     }
 

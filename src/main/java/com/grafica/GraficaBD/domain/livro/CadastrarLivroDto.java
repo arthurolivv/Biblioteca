@@ -18,4 +18,7 @@ public record CadastrarLivroDto(
         LocalDate data_de_publicacao
 ) {
 
+    public CadastrarLivroDto (Livro livro){
+        this(livro.getIsbn(), livro.getTitulo(), livro.getData_de_publicacao());
+    }
 }

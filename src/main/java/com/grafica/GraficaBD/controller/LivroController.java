@@ -7,9 +7,13 @@ import com.grafica.GraficaBD.repository.AutorRepository;
 import com.grafica.GraficaBD.repository.EditoraRepository;
 import com.grafica.GraficaBD.repository.EscreveRepository;
 import com.grafica.GraficaBD.repository.LivroRepository;
+import com.grafica.GraficaBD.service.EditoraService;
+import com.grafica.GraficaBD.service.EscreveService;
+import com.grafica.GraficaBD.service.LivroService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,121 +24,74 @@ public class LivroController {
 
     @Autowired
     private LivroRepository livroRepository;
+
     @Autowired
     private AutorRepository autorRepository;
+
     @Autowired
     private EscreveRepository escreveRepository;
+
     @Autowired
     private EditoraRepository editoraRepository;
 
+    @Autowired
+    private LivroService livroService;
+
+    @Autowired
+    private EscreveService escreveService;
+
     @PostMapping
     @Transactional
-    public void cadastrar(@RequestBody @Valid CadastrarLivroDto cadastrarLivroDto) {
+    public ResponseEntity cadastrar(@RequestBody @Valid CadastrarLivroDto cadastrarLivroDto) {
 
-        var novoLivro = new Livro(cadastrarLivroDto);
-
-        livroRepository.save(novoLivro);
+        var dto = livroService.cadastrar(cadastrarLivroDto);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/{isbn}/autor")
     @Transactional
-    public void adicionarAutor(@PathVariable String isbn, @RequestBody @Valid AutoresPorRgDto autoresPorRgDto) {
+    public ResponseEntity vincularLivroEAutores(@PathVariable String isbn, @RequestBody @Valid AutoresPorRgDto autoresPorRgDto) {
 
-        var livro = livroRepository.findById(isbn)
-                .orElseThrow(()-> new RuntimeException("Livro não encontrado!"));
-
-            for (String autorRg : autoresPorRgDto.autores_rg()) {
-
-                var autor = autorRepository.findById(autorRg)
-                        .orElseThrow(() -> new RuntimeException("Autor não encontrado!"));
-
-                var escreve = new Escreve(new EscreveId(livro.getIsbn(), autorRg),
-                        livro,
-                        autor);
-
-                livro.getEscreve().add(escreve);
-            }
-
-        livroRepository.save(livro);
-    }
-
-    @DeleteMapping("/{isbn}/autor")
-    @Transactional
-    public void deletarAutor(@PathVariable String isbn, @RequestBody @Valid AutoresPorRgDto autoresPorRgDto) {
-
-        var livro = livroRepository.findById(isbn)
-                .orElseThrow(()-> new RuntimeException("Livro não encontrado!"));
-
-        for(String autorRg : autoresPorRgDto.autores_rg()){
-
-            var escreve = escreveRepository.findById(new EscreveId(livro.getIsbn(), autorRg))
-                    .orElseThrow(() -> new RuntimeException("Relação entre livro e autor não encontrada!"));
-
-            escreve.setLivro(null);
-            livro.getEscreve().remove(escreve);
-        }
-
-        livroRepository.save(livro);
+        var dto = escreveService.vincularLivroEAutores(isbn,autoresPorRgDto);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping
-    public List<ListarLivroDto> listar(){
+    public ResponseEntity listar(){
 
-        List<ListarLivroDto> livros = livroRepository.findAll()
-                .stream()
-                .map(ListarLivroDto::new)
-                .toList();
-
-        return livros;
+        var dto = livroService.listar();
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/{isbn}")
-    public DetalharLivroDto detalhar(@PathVariable String isbn) {
+    public ResponseEntity detalhar(@PathVariable String isbn) {
 
-        var livro = livroRepository.findById(isbn)
-                .orElseThrow(() -> new RuntimeException("Livro não encontrado"));
-
-        List<DetalharNomeRgAutorDto> autores = livro.getEscreve()
-                .stream()
-                .map(Escreve::getAutor)
-                .map(DetalharNomeRgAutorDto::new)
-                .toList();
-
-        return new DetalharLivroDto(livro, autores);
-
+        var dto =  livroService.detalhar(isbn);
+        return ResponseEntity.ok(dto);
     }
 
     @PutMapping("/{isbn}")
     @Transactional
-    public void atualizar(@PathVariable String isbn, @RequestBody @Valid AtualizarTituloDataPublicacaoEditoraDoLivroDto atualizarTituloDataPublicacaoEditoraDoLivroDto) {
+    public ResponseEntity<Object> atualizar(@PathVariable String isbn, @RequestBody @Valid AtualizarTituloDataPublicacaoEditoraDoLivroDto atualizarTituloDataPublicacaoEditoraDoLivroDto) {
 
-        var livro = livroRepository.findById(isbn)
-                .orElseThrow(() -> new RuntimeException("Livro não encontrado!"));
+        livroService.atualizar(isbn,atualizarTituloDataPublicacaoEditoraDoLivroDto);
+        return ResponseEntity.ok().build();
+    }
 
-        if(atualizarTituloDataPublicacaoEditoraDoLivroDto.titulo() != null && !atualizarTituloDataPublicacaoEditoraDoLivroDto.titulo().isBlank()){
-            livro.setTitulo(atualizarTituloDataPublicacaoEditoraDoLivroDto.titulo());
-        }
-        if(atualizarTituloDataPublicacaoEditoraDoLivroDto.data_de_publicacao() != null && !atualizarTituloDataPublicacaoEditoraDoLivroDto.data_de_publicacao().toString().isBlank()){
-            livro.setData_de_publicacao(atualizarTituloDataPublicacaoEditoraDoLivroDto.data_de_publicacao());
-        }
-        livro.setEditora(
-                atualizarTituloDataPublicacaoEditoraDoLivroDto.editora_id() != null
-                        ? editoraRepository.findById(atualizarTituloDataPublicacaoEditoraDoLivroDto.editora_id())
-                        .orElseThrow(() -> new RuntimeException("Editora não encontrada!"))
-                        : null
-        );
+    @DeleteMapping("/{isbn}/autor")
+    @Transactional
+    public ResponseEntity desvincularLivroEAutores(@PathVariable String isbn, @RequestBody @Valid AutoresPorRgDto autoresPorRgDto) {
 
-        livroRepository.save(livro);
+        escreveService.desvincularLivroEAutores(isbn,autoresPorRgDto);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{isbn}")
     @Transactional
-    public void remover(@PathVariable String isbn) {
+    public ResponseEntity deletar(@PathVariable String isbn) {
 
-        var livro = livroRepository.findById(isbn)
-                .orElseThrow(()->new RuntimeException("Livro não Encontrado!"));
-
-        livroRepository.delete(livro);
+        livroService.deletar(isbn);
+        return ResponseEntity.noContent().build();
     }
 
 

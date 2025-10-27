@@ -23,9 +23,6 @@ public class EditoraController {
     private EditoraRepository editoraRepository;
 
     @Autowired
-    private LivroRepository livroRepository;
-
-    @Autowired
     private EditoraService editoraService;
 
     @PostMapping

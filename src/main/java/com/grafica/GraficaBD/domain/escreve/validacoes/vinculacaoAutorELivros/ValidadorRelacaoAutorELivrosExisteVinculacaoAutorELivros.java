@@ -8,24 +8,24 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
-public class ValidadorRelacaoAutorELivrosNaoExiste implements ValidadorVinculacaoAutorELivros {
+public class ValidadorRelacaoAutorELivrosExisteVinculacaoAutorELivros implements ValidadorVinculacaoAutorELivros {
 
     @Autowired
     private AutorRepository autorRepository;
 
     @Autowired
-    ValidadorAutorExiste validadorAutorExiste;
+    ValidadorAutorExisteVinculacaoAutorELivros validadorAutorExisteVinculacaoAutorELivros;
 
     @Autowired
-    ValidadorLivroExiste validadorLivroExiste;
+    ValidadorLivroExisteVinculacaoAutorELivros validadorLivroExisteVinculacaoAutorELivros;
 
     public void validar(String rg, LivrosPorIsbnDto livrosPorIsbnDto) {
 
-        validadorAutorExiste.validar(rg, livrosPorIsbnDto);
+        validadorAutorExisteVinculacaoAutorELivros.validar(rg, livrosPorIsbnDto);
 
         var autor = autorRepository.getReferenceById(rg);
 
-        validadorLivroExiste.validar(rg, livrosPorIsbnDto);
+        validadorLivroExisteVinculacaoAutorELivros.validar(rg, livrosPorIsbnDto);
 
         for(String isbn : livrosPorIsbnDto.isbns()){
 

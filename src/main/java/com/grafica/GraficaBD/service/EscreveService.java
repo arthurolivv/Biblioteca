@@ -4,9 +4,14 @@ import com.grafica.GraficaBD.domain.autor.DetalharAutorDto;
 import com.grafica.GraficaBD.domain.autor.LivrosPorIsbnDto;
 import com.grafica.GraficaBD.domain.escreve.Escreve;
 import com.grafica.GraficaBD.domain.escreve.EscreveId;
-import com.grafica.GraficaBD.domain.escreve.validacoes.vinculacaoAutorELivros.ValidadorRelacaoAutorELivrosExiste;
-import com.grafica.GraficaBD.domain.escreve.validacoes.vinculacaoAutorELivros.ValidadorRelacaoAutorELivrosNaoExiste;
+import com.grafica.GraficaBD.domain.escreve.validacoes.vinculacaoAutorELivros.ValidadorRelacaoAutorELivrosNaoExisteVinculacaoAutorELivros;
+import com.grafica.GraficaBD.domain.escreve.validacoes.vinculacaoAutorELivros.ValidadorRelacaoAutorELivrosExisteVinculacaoAutorELivros;
 import com.grafica.GraficaBD.domain.escreve.validacoes.vinculacaoAutorELivros.ValidadorVinculacaoAutorELivros;
+import com.grafica.GraficaBD.domain.escreve.vinculacaoLivroEAutores.ValidadorRelacaoLivroEAutorExisteVinculacaoLivroEAutores;
+import com.grafica.GraficaBD.domain.escreve.vinculacaoLivroEAutores.ValidadorRelacaoLivroEAutorNaoExisteVinculacaoLivroEAutores;
+import com.grafica.GraficaBD.domain.escreve.vinculacaoLivroEAutores.ValidadorVinculacaoLivroEAutores;
+import com.grafica.GraficaBD.domain.livro.AutoresPorRgDto;
+import com.grafica.GraficaBD.domain.livro.DetalharLivroDto;
 import com.grafica.GraficaBD.repository.AutorRepository;
 import com.grafica.GraficaBD.repository.EscreveRepository;
 import com.grafica.GraficaBD.repository.LivroRepository;
@@ -25,15 +30,19 @@ public class EscreveService {
     private LivroRepository livroRepository;
 
     @Autowired
-    private List<ValidadorVinculacaoAutorELivros> validadoresVerificarExistencia;
+    private List<ValidadorVinculacaoAutorELivros> validadoresVerificarExistenciaAutorELivros;
+
+    @Autowired
+    private List<ValidadorVinculacaoLivroEAutores> validadoresVerificarExistenciaLivroEAutores;
+
     @Autowired
     private EscreveRepository escreveRepository;
 
 
     public DetalharAutorDto vincularAutorELivros(String rg, LivrosPorIsbnDto livrosPorIsbnDto) {
 
-        validadoresVerificarExistencia.stream()
-                .filter(v -> !(v instanceof ValidadorRelacaoAutorELivrosNaoExiste))
+        validadoresVerificarExistenciaAutorELivros.stream()
+                .filter(v -> !(v instanceof ValidadorRelacaoAutorELivrosExisteVinculacaoAutorELivros))
                 .forEach(v -> v.validar(rg, livrosPorIsbnDto));
 
         var autor = autorRepository.getReferenceById(rg);
@@ -53,10 +62,10 @@ public class EscreveService {
         return new DetalharAutorDto(autor);
     }
 
-    public DetalharAutorDto desvincularAutorELivros(String rg, LivrosPorIsbnDto livrosPorIsbnDto) {
+    public void desvincularAutorELivros(String rg, LivrosPorIsbnDto livrosPorIsbnDto) {
 
-        validadoresVerificarExistencia.stream()
-                .filter(v -> !(v instanceof ValidadorRelacaoAutorELivrosExiste))
+        validadoresVerificarExistenciaAutorELivros.stream()
+                .filter(v -> !(v instanceof ValidadorRelacaoAutorELivrosNaoExisteVinculacaoAutorELivros))
                 .forEach(v -> v.validar(rg, livrosPorIsbnDto));
 
         var autor = autorRepository.getReferenceById(rg);
@@ -69,8 +78,45 @@ public class EscreveService {
         }
 
         autorRepository.save(autor);
-        return new DetalharAutorDto(autor);
     }
 
-    public void vincularLivroEAutores() {}
+    public DetalharLivroDto vincularLivroEAutores(String isbn, AutoresPorRgDto autoresPorRgDto){
+
+        validadoresVerificarExistenciaLivroEAutores.stream()
+                .filter(v -> !(v instanceof ValidadorRelacaoLivroEAutorExisteVinculacaoLivroEAutores))
+                .forEach(v -> v.validar(isbn, autoresPorRgDto));
+
+        var livro = livroRepository.getReferenceById(isbn);
+
+        for(String autor_rg : autoresPorRgDto.autores_rg()){
+
+            var autor = autorRepository.getReferenceById(autor_rg);
+
+            var escreve = new Escreve(new EscreveId(isbn, autor_rg),
+                    livro,
+                    autor);
+
+            livro.getEscreve().add(escreve);
+        }
+        livroRepository.save(livro);
+        return new DetalharLivroDto(livro);
+
+    }
+
+    public void desvincularLivroEAutores(String isbn, AutoresPorRgDto autoresPorRgDto){
+
+        validadoresVerificarExistenciaLivroEAutores.stream()
+                .filter(v -> !(v instanceof ValidadorRelacaoLivroEAutorNaoExisteVinculacaoLivroEAutores))
+                .forEach(v -> v.validar(isbn, autoresPorRgDto));
+
+        var livro = livroRepository.getReferenceById(isbn);
+
+        for(String autor_rg : autoresPorRgDto.autores_rg()){
+
+            var escreve = escreveRepository.getReferenceById(new EscreveId(isbn, autor_rg));
+
+            livro.getEscreve().remove(escreve);
+        }
+        livroRepository.save(livro);
+    }
 }

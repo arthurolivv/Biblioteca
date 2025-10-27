@@ -16,9 +16,7 @@ import com.grafica.GraficaBD.repository.LivroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.jar.JarFile;
 
 @Service
 public class EditoraService {
@@ -44,7 +42,8 @@ public class EditoraService {
     @Autowired
     private List<ValidadorDesvincularLivro> validadorDesvincularLivros;
 
-    @Autowired List<ValidadorDeletarEditora> validadorDeletarEditora;
+    @Autowired
+    private List<ValidadorDeletarEditora> validadorDeletarEditora;
 
     public DetalharEditoraDto cadastrar(CriarEditoraDto criarEditoraDto){
 

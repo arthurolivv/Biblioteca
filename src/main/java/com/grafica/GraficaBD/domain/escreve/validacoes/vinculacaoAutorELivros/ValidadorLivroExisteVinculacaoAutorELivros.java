@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
-public class ValidadorLivroExiste implements ValidadorVinculacaoAutorELivros {
+public class ValidadorLivroExisteVinculacaoAutorELivros implements ValidadorVinculacaoAutorELivros {
 
     @Autowired
     private LivroRepository livroRepository;

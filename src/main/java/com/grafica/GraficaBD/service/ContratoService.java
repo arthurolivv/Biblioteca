@@ -10,7 +10,9 @@ import com.grafica.GraficaBD.repository.GraficaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 @Service
 public class ContratoService {
@@ -38,5 +40,19 @@ public class ContratoService {
         contratoRepository.save(contrato);
 
         return new DetalharNovoContratoDto(contrato);
+    }
+
+    //deletarContrato
+
+    public List<ListarTodosOsContratosDto> detalhar(){
+
+        List<Contrato> contratos = StreamSupport.stream(contratoRepository.findAll().spliterator(), false)
+                .toList();
+
+        List<ListarTodosOsContratosDto> detalharContratos = contratos.stream()
+                .map(ListarTodosOsContratosDto::new)
+                .toList();
+
+        return detalharContratos;
     }
 }

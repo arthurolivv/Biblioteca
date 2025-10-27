@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
-public class ValidadorGraficaExiste implements ValidadorDeletarGrafica{
+public class ValidadorGraficaExisteDeletarGrafica implements ValidadorDeletarGrafica{
 
     @Autowired
     private GraficaRepository graficaRepository;
